@@ -2,6 +2,24 @@ import { supabase } from './supabaseClient';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
+function buildUrl(path: string): string {
+  let base = API_BASE_URL.trim();
+  if (base.endsWith('/')) {
+    base = base.slice(0, -1);
+  }
+  
+  let p = path.trim();
+  if (!p.startsWith('/')) {
+    p = '/' + p;
+  }
+  
+  if (base.endsWith('/api') && p.startsWith('/api/')) {
+    p = p.slice(4);
+  }
+  
+  return `${base}${p}`;
+}
+
 async function getHeaders(): Promise<HeadersInit> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -43,7 +61,7 @@ async function handleResponse(res: Response): Promise<any> {
 
 export async function apiGet(path: string): Promise<any> {
   const headers = await getHeaders();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(buildUrl(path), {
     method: 'GET',
     headers,
   });
@@ -59,13 +77,13 @@ export async function apiPost(path: string, body?: any): Promise<any> {
   if (body !== undefined) {
     config.body = JSON.stringify(body);
   }
-  const res = await fetch(`${API_BASE_URL}${path}`, config);
+  const res = await fetch(buildUrl(path), config);
   return handleResponse(res);
 }
 
 export async function apiDelete(path: string): Promise<any> {
   const headers = await getHeaders();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(buildUrl(path), {
     method: 'DELETE',
     headers,
   });
@@ -74,7 +92,7 @@ export async function apiDelete(path: string): Promise<any> {
 
 export async function apiGetBlob(path: string): Promise<{ blob: Blob; filename: string }> {
   const headers = await getHeaders();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(buildUrl(path), {
     method: 'GET',
     headers,
   });
