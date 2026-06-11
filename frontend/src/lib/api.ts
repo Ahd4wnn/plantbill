@@ -13,8 +13,12 @@ function buildUrl(path: string): string {
     p = '/' + p;
   }
   
-  if (base.endsWith('/api') && p.startsWith('/api/')) {
-    p = p.slice(4);
+  if (base.endsWith('/api')) {
+    if (p === '/api') {
+      p = '';
+    } else if (p.startsWith('/api/')) {
+      p = p.slice(4);
+    }
   }
   
   return `${base}${p}`;
